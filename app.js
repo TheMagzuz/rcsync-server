@@ -9,6 +9,8 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+const tokens = require('tokens');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 
@@ -18,6 +20,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
+
+indexRouter.use(jwt({secret: tokens.privateKey}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
