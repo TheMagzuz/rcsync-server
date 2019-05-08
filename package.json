@@ -10,9 +10,12 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "express-jwt": "^5.3.1",
+    "express-unless": "^0.5.0",
     "http-errors": "~1.6.2",
     "jade": "^1.11.0",
     "jsonwebtoken": "^8.5.1",
-    "morgan": "~1.9.0"
+    "morgan": "~1.9.0",
+    "multer": "^1.4.1"
   }
 }

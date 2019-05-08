@@ -6,25 +6,33 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var rcRouter = require('./routes/rc.js');
 
 var app = express();
 
-const tokens = require('tokens');
+const tokens = require('./tokens');
+
+const jwt = require('express-jwt');
+
+const unless = require('express-unless');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(logger('dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
 
-indexRouter.use(jwt({secret: tokens.privateKey}));
+app.use(jwt({secret: tokens.publicKey}).unless({path: [/\/users\/.*/]}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/rc', rcRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
