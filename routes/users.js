@@ -14,10 +14,15 @@ const shortTokenDuration = "2h";
 const longTokenDuration =  "1d";
 
 router.post('/register', (req, res, next) => {
-    const userinfo = {username: req.body.username, email: req.body.email, hash: undefined};
+    const userinfo = {username: req.body.username, email: req.body.email, hash: undefined, rcs: {}};
+
+    if (!userinfo.username || !req.body.password) {
+        res.status(400).end();
+        return;
+    }
 
     if (fs.existsSync(usersPath + userinfo.username)) {
-        res.status(500).send("User already exists");
+        res.status(400).send("User already exists");
         return;
     }
 
