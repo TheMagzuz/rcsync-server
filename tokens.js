@@ -8,11 +8,11 @@ const publicKey = fs.readFileSync(__dirname + '/publickey');
 var exports = module.exports = {}
 
 exports.getToken = (username, expiresIn) => {
-    return jwt.sign({username: username}, privateKey, {expiresIn: expiresIn});
+    return jwt.sign({username: username}, privateKey, {expiresIn: expiresIn, algorithm: 'RS256'});
 }
 
 exports.verify = (token) => {
-    return jwt.verify(token, privateKey);
+    return jwt.verify(token, publicKey);
 }
 
 exports.privateKey = privateKey;

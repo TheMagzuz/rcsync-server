@@ -12,7 +12,7 @@ var app = express();
 
 const tokens = require('./tokens');
 
-const jwt = require('express-jwt');
+const jwt = require('./jwt-middleware');
 
 const unless = require('express-unless');
 
@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
 
-app.use(jwt({secret: tokens.publicKey}).unless({path: [/\/users\/.*/]}));
+app.use(jwt(tokens).unless({path: [/\/users\/.*/]}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
