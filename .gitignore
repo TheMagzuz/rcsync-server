@@ -65,3 +65,6 @@ db/
 
 # Keys
 *.key
+
+# Swap files
+*.swp
