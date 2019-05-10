@@ -11,6 +11,15 @@ exports.getToken = (username, expiresIn) => {
     return jwt.sign({username: username}, privateKey, {expiresIn: expiresIn, algorithm: 'RS256'});
 }
 
+exports.decode = (token) => {
+    if (token.startsWith("Bearer")) {
+        token = token.split(" ")[1];
+    }
+
+    return jwt.decode(token)
+
+}
+
 exports.verify = (token) => {
     return jwt.verify(token, publicKey);
 }
