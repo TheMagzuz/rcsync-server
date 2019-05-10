@@ -3,9 +3,8 @@ var router = express.Router();
 
 const fs = require('fs');
 
-const tokens = require('../tokens.js');
-
-const usersPath = __dirname + '/../db/';
+const tokens = require('../tokens');
+const database = require('../db');
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -21,7 +20,7 @@ router.post('/register', (req, res, next) => {
         return;
     }
 
-    if (fs.existsSync(usersPath + userinfo.username)) {
+    if (database.userExists(userinfo.username)) {
         res.status(400).send("User already exists");
         return;
     }
