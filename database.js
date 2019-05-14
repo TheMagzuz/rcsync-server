@@ -2,7 +2,9 @@ var exports = module.exports = {}
 
 const fs = require('fs');
 
-exports.usersPath = __dirname + '/../db/';
+const usersPath = __dirname + '/db/';
+
+exports.usersPath = usersPath;
 
 /**
  * Check if a user exists
@@ -11,4 +13,16 @@ exports.usersPath = __dirname + '/../db/';
  */
 exports.userExists = (username) => {
     return fs.existsSync(usersPath + username);
+}
+
+exports.getUser = (username) => {
+    return JSON.parse(fs.readFileSync(usersPath + username + '/userinfo.json'));
+}
+
+exports.writeUser = (userinfo, username=userinfo.username, callback) => {
+    fs.writeFile(usersPath + username + '/userinfo.json', JSON.stringify(userInfo), callback);
+}
+
+exports.hasRc = (username, id) => {
+    return fs.existsSync(path.join(usersPath, username, id)); 
 }

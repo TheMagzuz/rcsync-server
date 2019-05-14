@@ -4,7 +4,7 @@ var router = express.Router();
 const fs = require('fs');
 
 const tokens = require('../tokens');
-const database = require('../db');
+const database = require('../database');
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -12,8 +12,11 @@ const saltRounds = 10;
 const shortTokenDuration = "2h";
 const longTokenDuration =  "1d";
 
-router.post('/register', (req, res, next) => {
-    const userinfo = {username: req.body.username, email: req.body.email, hash: undefined, rcs: {}};
+const usersPath = database.usersPath;
+
+router.post('/register', (req, res) => {
+    const userinfo = {username: req.body.username, email: req.body.email, hash: undefined, rcs: []};
+
 
     if (!userinfo.username || !req.body.password) {
         res.status(400).end();
@@ -45,7 +48,7 @@ router.post('/login', (req, res, next) => {
 
     const remember = req.body.rememberMe || false;
 
-    if (!fs.existsSync(usersPath + username)) {
+    if (!database.userExists(username)) {
         res.status(401).send("Invalid credentials");
         return;
     }
