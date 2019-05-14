@@ -21,6 +21,9 @@ exports.decode = (token) => {
 }
 
 exports.verify = (token) => {
+    if (token.startsWith("Bearer")) {
+        token = token.split(" ")[1];
+    }
     return jwt.verify(token, publicKey);
 }
 
