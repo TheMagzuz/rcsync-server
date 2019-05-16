@@ -27,12 +27,12 @@ router.post('/create', multer().single('rc'), (req, res) => {
         }
 
         fs.writeFile(filePath, req.file.buffer, (err) => {
-            const userInfo = users.getUser(username); 
+            const userInfo = users.getUser(username);
 
             userInfo.rcs.push({id: id, visibility: req.body.visibility || 'unlisted'});
 
             users.writeUser(userInfo, undefined, (err) => {
-                res.status(201).send(id); 
+                res.status(201).send(id);
             });
 
         });
@@ -59,7 +59,7 @@ router.get('/get/:user/:id', (req, res) => {
         return;
     }
 
-    var username; 
+    var username;
 
     if (req.headers.authorization) {
         username = tokens.decode(req.headers.authorization);
@@ -75,4 +75,9 @@ router.get('/get/:user/:id', (req, res) => {
         }
         return;
     } else {
-        console.log(__dirname + '/../db/' + req.params.user + '/' + req.params.id) res.status(200).sendFile(__dirname + '/../db/' + req.params.username + '/' + req.params.id); } }); module.exports = router;
+        const options = { root:__dirname + '/../db/' };
+        res.status(200).sendFile('./' + req.params.user+ '/' + req.params.id, options);
+    }
+});
+
+module.exports = router;
