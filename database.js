@@ -31,3 +31,4 @@ exports.hasRc = (username, id) => {
 exports.getRcInfo = (username, id) => {
     return exports.getUser(username).rcs.find(rc => rc.id == id);
 }
+
