@@ -1,6 +1,7 @@
 var exports = module.exports = {}
 
 const fs = require('fs');
+const path = require('path');
 
 const usersPath = __dirname + '/db/';
 
@@ -20,9 +21,13 @@ exports.getUser = (username) => {
 }
 
 exports.writeUser = (userinfo, username=userinfo.username, callback) => {
-    fs.writeFile(usersPath + username + '/userinfo.json', JSON.stringify(userInfo), callback);
+    fs.writeFile(usersPath + username + '/userinfo.json', JSON.stringify(userinfo), callback);
 }
 
 exports.hasRc = (username, id) => {
     return fs.existsSync(path.join(usersPath, username, id)); 
+}
+
+exports.getRcInfo = (username, id) => {
+    return exports.getUser(username).rcs.find(rc => rc.id == id);
 }
