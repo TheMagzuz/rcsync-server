@@ -15,7 +15,7 @@ const longTokenDuration =  "1d";
 const usersPath = database.usersPath;
 
 router.post('/register', (req, res) => {
-    const userinfo = {username: req.body.username, email: req.body.email, hash: undefined, rcs: []};
+    const userinfo = {username: req.body.username, email: req.body.email, hash: undefined, rcs: [], liked: [], disliked: []};
 
 
     if (!userinfo.username || !req.body.password) {
