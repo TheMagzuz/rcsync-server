@@ -29,7 +29,7 @@ router.post('/create', multer().single('rc'), (req, res) => {
         fs.writeFile(filePath, req.file.buffer, (err) => {
             const userInfo = users.getUser(username);
 
-            userInfo.rcs.push({id: id, visibility: req.body.visibility || 'unlisted'});
+            userInfo.rcs.push({id: id, visibility: req.body.visibility || 'unlisted', tags: req.body.tags.split(','), name: req.body.name, description: req.body.description, likes: 0, dislikes: 0});
 
             users.writeUser(userInfo, undefined, (err) => {
                 res.status(201).send(id);
