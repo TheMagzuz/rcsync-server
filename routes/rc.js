@@ -80,4 +80,57 @@ router.get('/:user/:id', (req, res) => {
     }
 });
 
+router.post('/:user/:id/togglelike', (req, res) => {
+    if (!req.headers.authorization || !tokens.verify(req.headers.authorization)) {
+        res.status(401).end();
+        return;
+    }
+
+    const targetRC = `${req.params.user}/${req.params.id}`
+    const username = tokens.decode(req.headers.authorization);
+    var userinfo = users.getUser(username);
+
+    if (userinfo.liked.includes(targetRC)) {
+       users.unlikeRC(req.params.user, req.params.id);
+       userinfo.liked.splice(userinfo.liked.indexOf(targetRC));
+    } else {
+        if (userinfo.disliked.includes(targetRC)) {
+            users.undislikeRC(req.params.username, req.params.id);
+            userinfo.disliked.split(userinfo.disliked.indexOf(targetRC));
+        }
+        users.likeRC(req.params.user, req.params.id);
+        userinfo.liked.push(targetRC);
+    }
+
+    users.writeUser(userinfo);
+    res.status(200).end();
+})
+
+router.post('/:user/:id/toggledislike', (req, res) => {
+    if (!req.headers.authorization || !tokens.verify(req.headers.authorization)) {
+        res.status(401).end();
+        return;
+    }
+
+    const targetRC = `${req.params.user}/${req.params.id}`
+    const username = tokens.decode(req.headers.authorization);
+    var userinfo = users.getUser(username);
+
+    if (userinfo.disliked.includes(targetRC)) {
+       users.undislikeRC(req.params.user, req.params.id);
+       userinfo.disliked.splice(userinfo.disliked.indexOf(targetRC));
+    } else {
+        if (userinfo.liked.includes(targetRC)) {
+            users.unlikeRC(req.params.username, req.params.id);
+            userinfo.liked.split(userinfo.liked.indexOf(targetRC));
+        }
+        users.dislikeRC(req.params.user, req.params.id);
+        userinfo.disliked.push(targetRC);
+    }
+
+    users.writeUser(userinfo);
+    res.status(200).end();
+})
+
+
 module.exports = router;
