@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const fs = require('fs');
+const database = require('./database.js');
 
 const privateKey = fs.readFileSync(__dirname + '/private.key');
 const publicKey = fs.readFileSync(__dirname + '/publickey');

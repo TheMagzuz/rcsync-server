@@ -47,7 +47,7 @@ router.post('/create', multer().single('rc'), (req, res) => {
     res.status(500).end();
 });
 
-router.get('/get/:user/:id', (req, res) => {
+router.get('/:user/:id', (req, res) => {
     if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
         res.status(404).end();
         return;
