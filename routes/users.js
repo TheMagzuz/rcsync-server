@@ -55,22 +55,23 @@ router.post('/login', (req, res, next) => {
 
     const remember = req.body.rememberMe || false;
 
-    debugger;
-
     if (!database.userExists(username)) {
         res.status(401).send("Invalid credentials");
         return;
     }
 
-    const userinfo = JSON.parse(fs.readFileSync(usersPath + username + '/userinfo.json'));
+    co(function*() {
+        const userinfo = yield database.getUser(username);
 
-    bcrypt.compare(password, userinfo.hash, (err, matches) => {
-        if (matches) {
-            res.status(200).json(tokens.getToken(userinfo.username, remember ? longTokenDuration : shortTokenDuration));
-        } else {
-            res.status(401).send("Invalid credentials");
-        }
+        bcrypt.compare(password, userinfo.hash, (err, matches) => {
+            if (matches) {
+                res.status(200).json(tokens.getToken(userinfo.username, remember ? longTokenDuration : shortTokenDuration));
+            } else {
+                res.status(401).send("Invalid credentials");
+            }
+        })
     })
+
 })
 
 module.exports = router;

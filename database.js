@@ -32,7 +32,12 @@ exports.userExists = (username) => {
 
 exports.getUser = (username) => {
     return co(function*() {
-        return yield usersdb.findOne({username: username});
+        return new Promise((resolve, reject) => {
+            usersdb.findOne({username: username}, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+            });
+        })
     })
 }
 
@@ -47,10 +52,33 @@ exports.hasRc = (username, id) => {
 }
 
 exports.getRcInfo = (username, id) => {
-    return exports.getUser(username).rcs.find(rc => rc.id == id);
+    return co(function*() {
+        const user = yield exports.getUser(username);
+        return Promise.resolve(user.rcs[id]);
+    })
 }
 
-exports.likeRC = (username, id, callback) => {
+exports.addRc = (owner, rcInfo) => {
+    return co(function*() {
+        return new Promise((resolve, reject) => {
+           usersdb.update({username: owner}, { $push: { rcs: rcInfo } }, (err, numReplaced) => {
+               if (err) reject(err);
+               else resolve(numReplaced);
+           })
+        });
+    })
+}
+
+exports.likeRC = (username, id) => {
+    return co(function*() {
+        if (!exports.hasRc(username, id)) {
+            return Promise.reject(404);
+        }
+        usersdb.find({username: username, "rcs.id": id}, function (err, docs) {
+            console.log(docs);
+        });
+    })
+    /*
     var user = exports.getUser(username);
     var rcIndex = user.rcs.findIndex(rc => rc.id == id);
     var rc = user.rcs[rcIndex];
@@ -60,6 +88,7 @@ exports.likeRC = (username, id, callback) => {
     exports.writeUser(user, username, callback);
     rc.owner = username;
     db.update({id: id}, rc, {upsert: true}, (err, numReplaced) => {});
+    */
 }
 
 exports.unlikeRC = (username, id, callback) => {

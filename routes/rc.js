@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 
+const co = require('co');
+
 const multer = require('multer');
 
 const fs = require('fs');
@@ -27,14 +29,12 @@ router.post('/create', multer().single('rc'), (req, res) => {
         }
 
         fs.writeFile(filePath, req.file.buffer, (err) => {
-            const userInfo = users.getUser(username);
+            co(function*() {
+                const userInfo = yield users.getUser(username);
 
-            userInfo.rcs.push({id: id, visibility: req.body.visibility || 'unlisted', tags: req.body.tags.split(','), name: req.body.name, description: req.body.description, likes: 0, dislikes: 0});
-
-            users.writeUser(userInfo, undefined, (err) => {
+                yield users.addRc(username, {id: id, visibility: req.body.visibility || 'unlisted', tags: req.body.tags ? req.body.tags.split(',') : [], name: req.body.name, description: req.body.description, likes: 0, dislikes: 0});
                 res.status(201).send(id);
-            });
-
+            })
         });
 
         return;
@@ -85,30 +85,30 @@ router.post('/post/:user/:id/togglelike', (req, res) => {
         res.status(401).end();
         return;
     }
+    co(function*() {
+        const targetRC = `${req.params.user}/${req.params.id}`;
+        const username = tokens.decode(req.headers.authorization).username;
+        var userinfo = yield users.getUser(username);
 
-    const targetRC = `${req.params.user}/${req.params.id}`
-    const username = tokens.decode(req.headers.authorization).username;
-    var userinfo = users.getUser(username);
+        //    if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
+        //        res.status(404).end();
+        //        return;
+        //    }
 
-
-    if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
-        res.status(404).end();
-        return;
-    }
-
-    if (userinfo.liked.includes(targetRC)) {
-       users.unlikeRC(req.params.user, req.params.id);
-       userinfo.liked.splice(userinfo.liked.indexOf(targetRC));
-    } else {
-        if (userinfo.disliked.includes(targetRC)) {
-            users.undislikeRC(req.params.username, req.params.id);
-            userinfo.disliked.split(userinfo.disliked.indexOf(targetRC));
+        if (userinfo.liked.includes(targetRC)) {
+            users.unlikeRC(req.params.user, req.params.id);
+            userinfo.liked.splice(userinfo.liked.indexOf(targetRC));
+        } else {
+            /*       if (userinfo.disliked.includes(targetRC)) {
+                     users.undislikeRC(req.params.username, req.params.id);
+                     userinfo.disliked.split(userinfo.disliked.indexOf(targetRC));
+                     }*/
+            users.likeRC(req.params.user, req.params.id);
+            userinfo.liked.push(targetRC);
         }
-        users.likeRC(req.params.user, req.params.id);
-        userinfo.liked.push(targetRC);
-    }
 
-    users.writeUser(userinfo);
+        users.writeUser(userinfo);
+    })
     res.status(200).end();
 })
 
@@ -119,12 +119,12 @@ router.post('/:user/:id/toggledislike', (req, res) => {
     }
 
     const targetRC = `${req.params.user}/${req.params.id}`
-    const username = tokens.decode(req.headers.authorization);
+        const username = tokens.decode(req.headers.authorization);
     var userinfo = users.getUser(username);
 
     if (userinfo.disliked.includes(targetRC)) {
-       users.undislikeRC(req.params.user, req.params.id);
-       userinfo.disliked.splice(userinfo.disliked.indexOf(targetRC));
+        users.undislikeRC(req.params.user, req.params.id);
+        userinfo.disliked.splice(userinfo.disliked.indexOf(targetRC));
     } else {
         if (userinfo.liked.includes(targetRC)) {
             users.unlikeRC(req.params.username, req.params.id);
