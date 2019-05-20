@@ -47,7 +47,7 @@ router.post('/create', multer().single('rc'), (req, res) => {
     res.status(500).end();
 });
 
-router.get('/:user/:id', (req, res) => {
+router.get('/get/:user/:id', (req, res) => {
     if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
         res.status(404).end();
         return;
@@ -80,15 +80,21 @@ router.get('/:user/:id', (req, res) => {
     }
 });
 
-router.post('/:user/:id/togglelike', (req, res) => {
+router.post('/post/:user/:id/togglelike', (req, res) => {
     if (!req.headers.authorization || !tokens.verify(req.headers.authorization)) {
         res.status(401).end();
         return;
     }
 
     const targetRC = `${req.params.user}/${req.params.id}`
-    const username = tokens.decode(req.headers.authorization);
+    const username = tokens.decode(req.headers.authorization).username;
     var userinfo = users.getUser(username);
+
+
+    if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
+        res.status(404).end();
+        return;
+    }
 
     if (userinfo.liked.includes(targetRC)) {
        users.unlikeRC(req.params.user, req.params.id);

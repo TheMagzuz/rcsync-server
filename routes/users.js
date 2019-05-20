@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
+const co = require('co');
+const thunkify = require('thunkify');
+
 const fs = require('fs');
 
 const tokens = require('../tokens');
@@ -19,26 +22,30 @@ router.post('/register', (req, res) => {
 
 
     if (!userinfo.username || !req.body.password) {
-        res.status(400).end();
-        return;
+        res.status(400).end("Insufficient information");
+        return Promise.reject(new Error("Insufficient information"));
     }
 
-    if (database.userExists(userinfo.username)) {
-        res.status(400).send("User already exists");
-        return;
-    }
+    co(function*() {
+        const exists = yield database.userExists(userinfo.username);
+        if (exists) {
+            res.status(400).send("User already exists");
+            return;
+        }
 
-    bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(req.body.password, salt, function(err, hash) {
 
-            userinfo.hash = hash;
 
-            fs.mkdirSync(usersPath + userinfo.username);
-            fs.writeFileSync(usersPath + userinfo.username + '/userinfo.json', JSON.stringify(userinfo));
+        const hash = yield thunkify(bcrypt.hash)(req.body.password, saltRounds);
 
-            res.status(201).json(tokens.getToken(userinfo.username, "2h"));
-        });
+        userinfo.hash = hash;
+
+        yield thunkify(fs.mkdir)(usersPath + userinfo.username);
+        yield database.writeUser(userinfo);
+
+        res.status(201).json(tokens.getToken(userinfo.username, shortTokenDuration));
+
     })
+
 
 })
 
@@ -47,6 +54,8 @@ router.post('/login', (req, res, next) => {
     const password = req.body.password;
 
     const remember = req.body.rememberMe || false;
+
+    debugger;
 
     if (!database.userExists(username)) {
         res.status(401).send("Invalid credentials");
