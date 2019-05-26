@@ -68,3 +68,6 @@ db/
 
 # Swap files
 *.swp
+
+# Config files
+*.cfg

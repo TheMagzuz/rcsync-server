@@ -74,4 +74,11 @@ router.post('/login', (req, res, next) => {
 
 })
 
+router.get('/user', (req, res) => {
+    co(function*() {
+        console.log(yield database.addRc("test", {"id": "asd", "visibility": "public", "likes": 0, "dislikes": 0}));
+    })
+    res.status(200).end();
+})
+
 module.exports = router;

@@ -66,16 +66,16 @@ router.get('/get/:user/:id', (req, res) => {
     }
 
     if (rc.visibility == 'private') {
+        const options = { root:__dirname + '/../db/' };
         if (!username) {
             res.status(404).end();
         } else if (req.params.username.toLower() === username.toLower()) {
-            res.status(200).sendFile(__dirname + '/../db/' + username + '/' + req.params.id);
+            res.status(200).sendFile('./' + req.params.user+ '/' + req.params.id, options);
         } else {
             res.status(400).end()
         }
         return;
     } else {
-        const options = { root:__dirname + '/../db/' };
         res.status(200).sendFile('./' + req.params.user+ '/' + req.params.id, options);
     }
 });
@@ -104,7 +104,6 @@ router.post('/post/:user/:id/togglelike', (req, res) => {
                      userinfo.disliked.split(userinfo.disliked.indexOf(targetRC));
                      }*/
             users.likeRC(req.params.user, req.params.id);
-            userinfo.liked.push(targetRC);
         }
 
         users.writeUser(userinfo);
