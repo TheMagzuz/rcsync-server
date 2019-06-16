@@ -80,24 +80,44 @@ exports.unlikeRC = (username, id) => {
     })
 }
 
-exports.dislikeRC = (username, id, callback) => {
-    var user = exports.getUser(username);
-    var rcIndex = user.rcs.findIndex(rc => rc.id == id);
-    var rc = user.rcs[rcIndex];
-    rc.dislikes = rc.dislikes + 1 || 1;
-    user.rcs[rcIndex] = rc;
-    exports.writeUser(user, username, callback)
-        rc.owner = username;
-    db.update({id: id}, rc, {upsert: true}, (err, numReplaced) => {});
+exports.dislikeRC = (username, id) => {
+    return co(function*() {
+        if (!exports.hasRc(username, id)) {
+            return Promise.reject();
+        }
+        usersCollection.update({username: username, "rcs.id": id}, {$inc: {"rcs.dislikes": 1}});
+    })
 }
 
-exports.undislikeRC = (username, id, callback) => {
-    var user = exports.getUser(username);
-    var rcIndex = user.rcs.findIndex(rc => rc.id == id);
-    var rc = user.rcs[rcIndex];
-    rc.dislikes = rc.dislikes - 1 || 1;
-    user.rcs[rcIndex] = rc;
-    exports.writeUser(user, username, callback)
-        rc.owner = username;
-    db.update({id: id}, rc, {upsert: true}, (err, numReplaced) => {});
+exports.undislikeRC = (username, id) => {
+    return co(function*() {
+        if (!exports.hasRc(username, id)) {
+            return Promise.reject();
+        }
+        return usersCollection.update({username: username, "rcs.id": id}, {$inc: {"rcs.dislikes": -1}});
+    })
+}
+
+exports.pushLike = (username, rcOwner, id) => {
+    return co(function*() {
+       return usersCollection.update({username: username}, {$push: {"$.likes": `${rcOwner}/${id}`} });
+    })
+}
+
+exports.pullLike = (username, rcOwner, id) => {
+    return co(function*() {
+       return usersCollection.update({username: username}, {$pull: {"$.likes": `${rcOwner}/${id}`} });
+    })
+}
+
+exports.pushDislike = (username, rcOwner, id) => {
+    return co(function*() {
+       return usersCollection.update({username: username}, {$push: {"$.dislikes": `${rcOwner}/${id}`} });
+    })
+}
+
+exports.pullDislike = (username, rcOwner, id) => {
+    return co(function*() {
+       return usersCollection.update({username: username}, {$pull: {"$.dislikes": `${rcOwner}/${id}`} });
+    })
 }

@@ -90,20 +90,12 @@ router.post('/post/:user/:id/togglelike', (req, res) => {
         const username = tokens.decode(req.headers.authorization).username;
         var userinfo = yield users.getUser(username);
 
-        //    if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
-        //        res.status(404).end();
-        //        return;
-        //    }
-
         if (userinfo.liked.includes(targetRC)) {
             users.unlikeRC(req.params.user, req.params.id);
-            userinfo.liked.splice(userinfo.liked.indexOf(targetRC));
+            users.pullLike(username, req.params.user, req.params.id)
         } else {
-            /*       if (userinfo.disliked.includes(targetRC)) {
-                     users.undislikeRC(req.params.username, req.params.id);
-                     userinfo.disliked.split(userinfo.disliked.indexOf(targetRC));
-                     }*/
             users.likeRC(req.params.user, req.params.id);
+            users.pushLike(username, req.params.user, req.params.id)
         }
 
         users.writeUser(userinfo);
