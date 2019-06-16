@@ -71,3 +71,6 @@ db/
 
 # Config files
 *.cfg
+
+# Tags files
+tags
