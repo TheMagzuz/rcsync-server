@@ -43,7 +43,7 @@ exports.getUser = (username) => {
 }
 
 exports.writeUser = (userinfo, username=userinfo.username) => {
-    return usersCollection.update({username: username}, userInfo, {upsert: true});
+    return usersCollection.updateOne({username: username}, userinfo, {upsert: true});
 }
 
 exports.hasRc = (username, id) => {
@@ -59,7 +59,7 @@ exports.getRcInfo = (username, id) => {
 }
 
 exports.addRc = (owner, rcInfo) => {
-    return usersCollection.updateOne({username: owner}, {$push: {rcs: rcInfo}});
+    return usersCollection.updateOneOne({username: owner}, {$push: {rcs: rcInfo}});
 }
 
 exports.likeRC = (username, id) => {
@@ -67,7 +67,7 @@ exports.likeRC = (username, id) => {
         if (!exports.hasRc(username, id)) {
             return Promise.reject();
         }
-        usersCollection.update({username: username, "rcs.id": id}, {$inc: {"rcs.likes": 1}});
+        usersCollection.updateOne({username: username, "rcs.id": id}, {$inc: {"rcs.likes": 1}});
     })
 }
 
@@ -76,7 +76,7 @@ exports.unlikeRC = (username, id) => {
         if (!exports.hasRc(username, id)) {
             return Promise.reject();
         }
-        usersCollection.update({username: username, "rcs.id": id}, {$inc: {"rcs.likes": -1}});
+        usersCollection.updateOne({username: username, "rcs.id": id}, {$inc: {"rcs.likes": -1}});
     })
 }
 
@@ -85,7 +85,7 @@ exports.dislikeRC = (username, id) => {
         if (!exports.hasRc(username, id)) {
             return Promise.reject();
         }
-        usersCollection.update({username: username, "rcs.id": id}, {$inc: {"rcs.dislikes": 1}});
+        usersCollection.updateOne({username: username, "rcs.id": id}, {$inc: {"rcs.dislikes": 1}});
     })
 }
 
@@ -94,30 +94,30 @@ exports.undislikeRC = (username, id) => {
         if (!exports.hasRc(username, id)) {
             return Promise.reject();
         }
-        return usersCollection.update({username: username, "rcs.id": id}, {$inc: {"rcs.dislikes": -1}});
+        return usersCollection.updateOne({username: username, "rcs.id": id}, {$inc: {"rcs.dislikes": -1}});
     })
 }
 
 exports.pushLike = (username, rcOwner, id) => {
     return co(function*() {
-       return usersCollection.update({username: username}, {$push: {"$.likes": `${rcOwner}/${id}`} });
+       return usersCollection.updateOne({username: username}, {$push: {"$.likes": `${rcOwner}/${id}`} });
     })
 }
 
 exports.pullLike = (username, rcOwner, id) => {
     return co(function*() {
-       return usersCollection.update({username: username}, {$pull: {"$.likes": `${rcOwner}/${id}`} });
+       return usersCollection.updateOne({username: username}, {$pull: {"$.likes": `${rcOwner}/${id}`} });
     })
 }
 
 exports.pushDislike = (username, rcOwner, id) => {
     return co(function*() {
-       return usersCollection.update({username: username}, {$push: {"$.dislikes": `${rcOwner}/${id}`} });
+       return usersCollection.updateOne({username: username}, {$push: {"$.dislikes": `${rcOwner}/${id}`} });
     })
 }
 
 exports.pullDislike = (username, rcOwner, id) => {
     return co(function*() {
-       return usersCollection.update({username: username}, {$pull: {"$.dislikes": `${rcOwner}/${id}`} });
+       return usersCollection.updateOne({username: username}, {$pull: {"$.dislikes": `${rcOwner}/${id}`} });
     })
 }
