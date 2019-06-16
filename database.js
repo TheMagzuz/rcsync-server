@@ -14,9 +14,19 @@ const devMode = fs.existsSync('devMode.cfg');
 
 var client, db, usersCollection;
 
+var dbName;
+
+if (process.env.UNIT_TEST) {
+    dbName = "test";
+} else if (devMode) {
+    dbName = "dev"
+} else {
+    dbName = "prod"
+}
+
 co(function*() {
     client = yield MongoClient.connect(dbURL, {useNewUrlParser: true});
-    db = client.db(devMode ? "dev" : "prod");
+    db = client.db(dbName);
     usersCollection = db.collection("users")
 })
 
