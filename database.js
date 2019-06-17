@@ -4,6 +4,8 @@ const co = require('co');
 
 const fs = require('fs');
 const path = require('path');
+const rimraf = require('rimraf');
+const thunkify = require('thunkify');
 
 const MongoClient = require('mongodb').MongoClient;
 
@@ -15,6 +17,7 @@ const devMode = fs.existsSync('devMode.cfg');
 var client, db, usersCollection;
 
 var dbName;
+var usersPath = __dirname + '/db/';
 
 if (process.env.UNIT_TEST) {
     dbName = "test";
@@ -24,13 +27,18 @@ if (process.env.UNIT_TEST) {
     dbName = "prod"
 }
 
-co(function*() {
+usersPath += dbName + '/';
+
+if (!fs.existsSync(usersPath)) {
+    fs.mkdirSync(usersPath);
+}
+
+exports.ready = co(function*() {
     client = yield MongoClient.connect(dbURL, {useNewUrlParser: true});
     db = client.db(dbName);
     usersCollection = db.collection("users")
 })
 
-const usersPath = __dirname + '/db/';
 
 exports.usersPath = usersPath;
 
@@ -53,7 +61,7 @@ exports.getUser = (username) => {
 }
 
 exports.writeUser = (userinfo, username=userinfo.username) => {
-    return usersCollection.updateOne({username: username}, userinfo, {upsert: true});
+    return usersCollection.updateOne({username: username}, {$set: userinfo}, {upsert: true});
 }
 
 exports.hasRc = (username, id) => {
@@ -130,4 +138,15 @@ exports.pullDislike = (username, rcOwner, id) => {
     return co(function*() {
        return usersCollection.updateOne({username: username}, {$pull: {"$.dislikes": `${rcOwner}/${id}`} });
     })
+}
+
+exports.clearDatabase = () => {
+    if (dbName != "test") {
+        console.error("Tried to clear database when not in test mode, this is probably really bad");
+        process.exit(1);
+        return;
+    }
+    rimraf.sync(usersPath);
+    fs.mkdirSync(usersPath);
+    return usersCollection.deleteMany({});
 }

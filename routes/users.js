@@ -23,7 +23,7 @@ router.post('/register', (req, res) => {
 
     if (!userinfo.username || !req.body.password) {
         res.status(400).end("Insufficient information");
-        return Promise.reject(new Error("Insufficient information"));
+        return;
     }
 
     co(function*() {
@@ -55,12 +55,12 @@ router.post('/login', (req, res, next) => {
 
     const remember = req.body.rememberMe || false;
 
-    if (!database.userExists(username)) {
-        res.status(401).send("Invalid credentials");
-        return;
-    }
 
     co(function*() {
+        if (!(yield database.userExists(username))) {
+            res.status(401).send("Invalid credentials");
+            return;
+        }
         const userinfo = yield database.getUser(username);
 
         bcrypt.compare(password, userinfo.hash, (err, matches) => {
