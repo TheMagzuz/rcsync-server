@@ -11,15 +11,13 @@ describe('user manager', () => {
     })
     beforeEach(() => {
         www = require('./bin/www');
-        console.log(www)
         server = www.server;
-        console.log(server)
         return database.clearDatabase();
     });
     afterEach(() => {
         server.close();
     })
-    after(() => process.exit(0));
+    after(() => database.closeConnection());
     it('400 if password is not given', (done) => {
         request(server).post('/users/register').send({password: "password"}).expect(400, done);
     });
@@ -38,7 +36,7 @@ describe('user manager', () => {
     it('reject invalid passwords', (done) => {
         co(function*() {
             yield request(server).post('/users/register').send({username: "username", password: "password"})
-            request(server).post('/users/login').send({username: "username", password: "notpassword"}).expect(401, done);
+            request(server).post('/users/login').send({username: "username", password: "notpassword"}).expect(402, done);
         })
     })
     it('reject invalid usernames', (done) => {

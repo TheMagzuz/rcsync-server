@@ -150,3 +150,6 @@ exports.clearDatabase = () => {
     fs.mkdirSync(usersPath);
     return usersCollection.deleteMany({});
 }
+exports.closeConnection = () => {
+    client.close();
+}
