@@ -9,6 +9,8 @@ before_install:
   - npm install -g mocha
   - echo 'mongodb://127.0.0.1' > dbURL.cfg
   - mkdir db
+  - ssh-keygen -f ./private.key -N ""
+  - ssh-keygen -f ./private.key -m PEM -e > publickey
 addons:
   apt:
     sources:
