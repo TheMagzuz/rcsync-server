@@ -36,7 +36,7 @@ describe('user manager', () => {
     it('reject invalid passwords', (done) => {
         co(function*() {
             yield request(server).post('/users/register').send({username: "username", password: "password"})
-            request(server).post('/users/login').send({username: "username", password: "notpassword"}).expect(402, done);
+            request(server).post('/users/login').send({username: "username", password: "notpassword"}).expect(401, done);
         })
     })
     it('reject invalid usernames', (done) => {
