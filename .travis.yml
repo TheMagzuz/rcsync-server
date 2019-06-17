@@ -2,9 +2,12 @@ language: node_js
 node_js:
   - "node"
 sudo: required
+services:
+  - mongodb
 before_install:
   - npm install -g node-gyp
   - npm install -g mocha
+  - echo 'mongodb://127.0.0.1' > dbURL.cfg
 addons:
   apt:
     sources:
