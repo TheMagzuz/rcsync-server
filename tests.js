@@ -11,7 +11,9 @@ describe('user manager', () => {
     })
     beforeEach(() => {
         www = require('./bin/www');
+        console.log(www)
         server = www.server;
+        console.log(server)
         return database.clearDatabase();
     });
     afterEach(() => {
