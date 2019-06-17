@@ -4,6 +4,7 @@ node_js:
 sudo: required
 before_install:
   - npm install -g node-gyp
+  - npm install -g mocha
 addons:
   apt:
     sources:
