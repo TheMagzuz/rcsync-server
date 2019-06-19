@@ -47,7 +47,12 @@ router.post('/create', multer().single('rc'), (req, res) => {
 });
 
 router.get('/get', (req, res) => {
-    const username = tokens.decode(req.headers.authorization);
+    const username = tokens.decode(req.headers.authorization).username;
+    console.log(username);
+    co(function*() {
+        const rcs = yield users.getRcs(username)
+        res.status(200).send(rcs);
+    })
 })
 
 router.get('/get/:user/:id', (req, res) => {
