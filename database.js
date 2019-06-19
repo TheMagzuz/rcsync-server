@@ -14,7 +14,7 @@ const dbURL = fs.readFileSync(path.join(__dirname, 'dbURL.cfg')).toString();
 // Enable dev mode if the devMode.cfg file exists
 const devMode = fs.existsSync('devMode.cfg');
 
-var client, db, usersCollection;
+var client, db, usersCollection, rcsView;
 
 var dbName;
 var usersPath = __dirname + '/db/';
@@ -79,6 +79,13 @@ exports.getRcInfo = (username, id) => {
 
 exports.addRc = (owner, rcInfo) => {
     return usersCollection.updateOne({username: owner}, {$push: {rcs: rcInfo}});
+}
+
+exports.getRcs = (owner) => {
+    return co(function*() {
+        user = yield exports.getUser(owner)
+        return user.rcs;
+    })
 }
 
 exports.likeRC = (username, id) => {
