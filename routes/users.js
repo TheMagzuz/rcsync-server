@@ -17,12 +17,20 @@ const longTokenDuration =  "1d";
 
 const usersPath = database.usersPath;
 
+const validUsernamePattern = /(\w|\d)+/;
+
 router.post('/register', (req, res) => {
     const userinfo = {username: req.body.username, email: req.body.email, hash: undefined, rcs: [], liked: [], disliked: []};
 
 
+
     if (!userinfo.username || !req.body.password) {
         res.status(400).end("Insufficient information");
+        return;
+    }
+
+    if (!validUsernamePattern.test(userinfo.username)) {
+        res.status(400).end("Invalid username");
         return;
     }
 
@@ -32,7 +40,6 @@ router.post('/register', (req, res) => {
             res.status(400).send("User already exists");
             return;
         }
-
 
 
         const hash = yield thunkify(bcrypt.hash)(req.body.password, saltRounds);
@@ -54,7 +61,6 @@ router.post('/login', (req, res, next) => {
     const password = req.body.password;
 
     const remember = req.body.rememberMe || false;
-
 
     co(function*() {
         if (!(yield database.userExists(username))) {
