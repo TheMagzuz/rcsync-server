@@ -64,8 +64,8 @@ router.get('/get/:user/:id', (req, res) => {
         username = tokens.decode(req.headers.authorization);
     }
 
+    const options = { root: users.usersPath };
     if (rc.visibility == 'private') {
-        const options = { root:__dirname + '/../db/' };
         if (!username) {
             res.status(404).end();
         } else if (req.params.username.toLower() === username.toLower()) {

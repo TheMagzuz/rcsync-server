@@ -28,6 +28,7 @@ if (process.env.UNIT_TEST) {
 }
 
 usersPath += dbName + '/';
+exports.usersPath = usersPath;
 
 if (!fs.existsSync(usersPath)) {
     fs.mkdirSync(usersPath);
