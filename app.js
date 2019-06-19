@@ -28,12 +28,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
 
-app.use((req, res, next) => {
-    if (req.headers.authorization) {
-        debugger;
-    }
-    jwt(tokens).unless({path: [/\/users\/.*/]})(req, res, next);
-});
+app.use(jwt(tokens).unless({path: [/\/users\/.*/]}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

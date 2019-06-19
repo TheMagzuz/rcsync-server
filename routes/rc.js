@@ -14,7 +14,6 @@ const tokens = require('../tokens');
 const users = require('../database');
 
 router.post('/create', multer().single('rc'), (req, res) => {
-    console.log(req.headers.authorization);
     const username = tokens.decode(req.headers.authorization).username;
 
 
