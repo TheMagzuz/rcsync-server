@@ -14,7 +14,9 @@ const tokens = require('../tokens');
 const users = require('../database');
 
 router.post('/create', multer().single('rc'), (req, res) => {
+    console.log(req.headers.authorization);
     const username = tokens.decode(req.headers.authorization).username;
+
 
     if (users.userExists(username)) {
         const userpath = path.join(users.usersPath, username);
@@ -43,8 +45,6 @@ router.post('/create', multer().single('rc'), (req, res) => {
         res.status(401).end();
         return;
     }
-
-    res.status(500).end();
 });
 
 router.get('/get/:user/:id', (req, res) => {

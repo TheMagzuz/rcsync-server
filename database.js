@@ -77,7 +77,7 @@ exports.getRcInfo = (username, id) => {
 }
 
 exports.addRc = (owner, rcInfo) => {
-    return usersCollection.updateOneOne({username: owner}, {$push: {rcs: rcInfo}});
+    return usersCollection.updateOne({username: owner}, {$push: {rcs: rcInfo}});
 }
 
 exports.likeRC = (username, id) => {
