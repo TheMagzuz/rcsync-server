@@ -88,6 +88,13 @@ exports.getRcs = (owner) => {
     })
 }
 
+exports.getPublicRcs = (owner) => {
+    return co(function*() {
+        rcs = yield exports.getRcs(owner)
+        return rcs.filter(rc => rc.visibility == "public");
+    })
+}
+
 exports.likeRC = (username, id) => {
     return co(function*() {
         if (!exports.hasRc(username, id)) {

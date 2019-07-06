@@ -46,16 +46,23 @@ router.post('/create', multer().single('rc'), (req, res) => {
     }
 });
 
-router.get('/get', (req, res) => {
+router.get('/', (req, res) => {
     const username = tokens.decode(req.headers.authorization).username;
-    console.log(username);
     co(function*() {
         const rcs = yield users.getRcs(username)
         res.status(200).send(rcs);
     })
 })
 
-router.get('/get/:user/:id', (req, res) => {
+router.get('/:user', (req, res) => {
+    const username = req.params.user;
+    co(function*() {
+        const rcs = yield users.getPublicRcs(username)
+        res.status(200).send(rcs);
+    })
+})
+
+router.get('/:user/:id', (req, res) => {
     if (!users.userExists(req.params.user) || !users.hasRc(req.params.user, req.params.id)) {
         res.status(404).end();
         return;
@@ -88,7 +95,7 @@ router.get('/get/:user/:id', (req, res) => {
     }
 });
 
-router.post('/post/:user/:id/togglelike', (req, res) => {
+router.post('/:user/:id/togglelike', (req, res) => {
     if (!req.headers.authorization || !tokens.verify(req.headers.authorization)) {
         res.status(401).end();
         return;

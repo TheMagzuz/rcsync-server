@@ -41,7 +41,6 @@ router.post('/register', (req, res) => {
             return;
         }
 
-
         const hash = yield thunkify(bcrypt.hash)(req.body.password, saltRounds);
 
         userinfo.hash = hash;
