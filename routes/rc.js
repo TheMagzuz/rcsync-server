@@ -33,7 +33,7 @@ router.post('/create', multer().single('rc'), (req, res) => {
             co(function*() {
                 const userInfo = yield users.getUser(username);
 
-                yield users.addRc(username, {id: id, visibility: req.body.visibility || 'unlisted', tags: req.body.tags ? req.body.tags.split(',') : [], name: req.body.name, description: req.body.description, likes: 0, dislikes: 0});
+                yield users.addRc(username, {id: id, visibility: req.body.visibility || 'unlisted', tags: req.body.tags ? req.body.tags.split(',') : [], name: req.body.name || id, description: req.body.description, likes: 0, dislikes: 0});
                 res.status(201).send(id);
             })
         });
